@@ -145,6 +145,7 @@ namespace obit
 		getInt("Notification.iNotifResurrectDragonSoulCost", s.iNotifResurrectDragonSoulCost);
 		getInt("Log.iMaxEntriesPerPage", s.iMaxEntriesPerPage);
 		getBool("Debug.bVerboseLog", s.bVerboseLog);
+
 		if (auto it = kv.find("Blacklist.Entries"); it != kv.end()) {
 			s.sBlacklist = it->second;
 			_hasBlacklist = true;
@@ -176,7 +177,8 @@ namespace obit
 		}
 		out << "; ObituarySKSE - written by the plugin\n";
 		out << "[General]\n";
-		out << "bModEnabled=" << ToBool(s.bModEnabled) << "\n\n";
+		out << "bModEnabled=" << ToBool(s.bModEnabled) << "\n";
+		out << "\n";
 		out << "[Log]\n";
 		out << "bLogEnabled=" << ToBool(s.bLogEnabled) << "\n";
 		out << "bLogUniqueOnly=" << ToBool(s.bLogUniqueOnly) << "\n";

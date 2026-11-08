@@ -27,6 +27,7 @@ import sys
 EXTRA_ZH = {
     # 菜单
     "menutitle": "讣告 Obituary",
+    "menulogselect": "在左侧选择一条记录查看详情",
     "menusettings": "设置",
     "menulog": "日志",
     "menublacklist": "黑名单",
@@ -63,6 +64,7 @@ EXTRA_ZH = {
 
 EXTRA_EN = {
     "menutitle": "Obituary",
+    "menulogselect": "Select an entry on the left",
     "menusettings": "Settings",
     "menulog": "Log",
     "menublacklist": "Blacklist",
@@ -189,18 +191,19 @@ def main():
 
 
     # 4) 键表文档
-    lines = ["# ObituarySKSE 本地化说明", "",
-             "所有界面文本都在这两个文件里，键名不要改：", "",
-             "- `SKSE\\Plugins\\ObituarySKSE\\Strings.json` —— 插件与 F1 菜单的运行时文本（默认简体中文）",
-             "- `MCM\\Config\\ObituarySKSE\\config.json` —— MCM 菜单的控件文本（MCM Helper 只认字面量）", "",
-             "## 翻译步骤", "",
-             "1. 复制 `Strings.json` 为你的语言版本，逐条改值（保留 `%s` `%d` 占位符和 `\\n`）；",
-             "2. 改完跑一次 `tools\\localization.py --strings Strings.json --out <模组根目录>`，",
-             "   MCM 的 config.json 会用同一份文本重新生成；",
-             "3. 不想跑脚本也可以直接手改 `config.json` 里的 `text` / `help` 字段。", "",
-             "## 键表", "", "| 键 | 当前值 |", "|---|---|"]
-    for k in sorted(strings):
-        v = strings[k].replace("\n", "\\n").replace("|", "\\|")
+    lines = ["# ObituarySKSE localization", "",
+             "All UI text lives in one file; do not rename keys:", "",
+             "- `SKSE\\Plugins\\ObituarySKSE\\Strings.json` - runtime text for the plugin and the F1 menu",
+             "  (Simplified Chinese by default)",
+             "- `SKSE\\Plugins\\ObituarySKSE\\Strings.en.json` - English reference with the same keys", "",
+             "## Translating", "",
+             "1. Edit the values in `Strings.json` (keep `%s` `%d` placeholders and `\\n`);",
+             "2. `Strings.en.json` is only a reference template - replace its values if you want English;",
+             "3. `tools\\localization.py` merges the original mod's strings with the keys this plugin adds",
+             "   and regenerates `Strings.json` / `Strings.en.json` / this table.", "",
+             "## Key table", "", "| Key | Current value |", "|---|---|"]
+    for k in sorted(english):
+        v = english[k].replace("\n", "\\n").replace("|", "\\|")
         lines.append(f"| `{k}` | {v} |")
     with open(os.path.join(args.out, "LOCALIZATION.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

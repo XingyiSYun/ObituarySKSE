@@ -1,4 +1,4 @@
-#include "Localization.h"
+﻿#include "Localization.h"
 #include "Config.h"
 
 #include <algorithm>
@@ -164,10 +164,11 @@ namespace obit
 		_strings.clear();
 		_loaded = false;
 
-		// 1) 原版的 Strings.json（已有简体中文译文）
+		// 1) 原版的 Strings.json（若原模组还在，作为兜底）
 		_loaded |= ParseStringsFile(kStringsPath, _strings);
-		// 2) 本模组自己的覆盖文件（可补充按钮文本等新键）
+		// 2) 本模组默认文本（简体中文）
 		_loaded |= ParseStringsFile("Data/SKSE/Plugins/ObituarySKSE/Strings.json", _strings);
+
 
 		if (!_loaded) {
 			spdlog::warn("ObituarySKSE: no Strings.json found, using built-in defaults");

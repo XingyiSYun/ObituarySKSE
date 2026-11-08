@@ -56,6 +56,8 @@ All UI text lives in one file; do not rename keys:
 | `labelsex` | Sex: |
 | `labeltimeofdeath` | Time of Death: |
 | `labelunique` | Unique: |
+| `langdefault` | Default (Simplified Chinese) |
+| `language` | Language |
 | `log` | Log |
 | `logallowplayer` | Allow Player |
 | `logallowplayerinfo` | If enabled, allows the log to intercept the Player's death.\nDefault: OFF |
@@ -86,6 +88,7 @@ All UI text lives in one file; do not rename keys:
 | `menuheader_log` | Log Settings |
 | `menuheader_notif` | Notification Settings |
 | `menulog` | Log |
+| `menulogselect` | Select an entry on the left |
 | `menumethodlabel` | Method (0=Message Box, 1=Notification) |
 | `menunext` | Next Page |
 | `menunotarget` | Crosshair target: none |

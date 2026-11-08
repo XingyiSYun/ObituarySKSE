@@ -69,6 +69,7 @@
 		"menuheader_log": "Log Settings",
 		"menuheader_notif": "Notification Settings",
 		"menulog": "Log",
+		"menulogselect": "Select an entry on the left",
 		"menumethodlabel": "Method (0=Message Box, 1=Notification)",
 		"menunext": "Next Page",
 		"menunotarget": "Crosshair target: none",

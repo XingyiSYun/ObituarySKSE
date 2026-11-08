@@ -15,7 +15,15 @@
 #include <string>
 #include <vector>
 
+// 头文件不随仓库分发（第三方）。没有它时编译“无 F1 菜单”版本。
+#if __has_include("SKSEMenuFramework.h")
 #include "SKSEMenuFramework.h"
+#define OBIT_HAS_SMF 1
+#else
+#define OBIT_HAS_SMF 0
+#endif
+
+#if OBIT_HAS_SMF
 
 namespace obit::Menu
 {
@@ -67,6 +75,7 @@ namespace obit::Menu
 			changed |= Toggle(T("modenabled", "Mod Enabled"), &s.bModEnabled, T("modenabledinfo", ""));
 
 			ImGuiMCP::Separator();
+			ImGuiMCP::PushID("section-log");
 			if (ImGuiMCP::CollapsingHeader(T("menuheader_log", "Log Settings").c_str())) {
 				changed |= Toggle(T("logenabled", "Log Enabled"), &s.bLogEnabled, T("logenabledinfo", ""));
 				changed |= Toggle(T("loguniqueonly", "Unique Only"), &s.bLogUniqueOnly, T("loguniqueonlyinfo", ""));
@@ -84,8 +93,10 @@ namespace obit::Menu
 					manager.ClearLog();
 				}
 			}
+			ImGuiMCP::PopID();
 
 			ImGuiMCP::Separator();
+			ImGuiMCP::PushID("section-notif");
 			if (ImGuiMCP::CollapsingHeader(T("menuheader_notif", "Notification Settings").c_str())) {
 				changed |= Toggle(T("notificationenabled", "Notification Enabled"), &s.bNotificationEnabled,
 					T("notificationenabledinfo", ""));
@@ -122,6 +133,7 @@ namespace obit::Menu
 				changed |= Slider(T("notifresurrectdragonsoulcost", "Resurrect Dragon Soul Cost"),
 					&s.iNotifResurrectDragonSoulCost, 0, 20, T("notifresurrectdragonsoulcostinfo", ""));
 			}
+			ImGuiMCP::PopID();
 
 			ImGuiMCP::Separator();
 			const auto restore = T("restoredefaults", "Restore Defaults");
@@ -152,7 +164,7 @@ namespace obit::Menu
 			g_logPage = std::clamp(g_logPage, 0, pages - 1);
 
 			char status[256];
-			std::snprintf(status, sizeof(status), T("menuentries", "Entries: %d / %d  Page: %d / %d").c_str(),
+			std::snprintf(status, sizeof(status), T("menuentries", "Entries: %d / %d     Page: %d / %d").c_str(),
 				total, std::max(16, s.iMaxLogSize), g_logPage + 1, pages);
 			ImGuiMCP::TextUnformatted(status);
 
@@ -180,27 +192,46 @@ namespace obit::Menu
 
 			ImGuiMCP::Separator();
 
-			const int endExclusive = total - g_logPage * perPage;
-			const int startInclusive = std::max(0, endExclusive - perPage);
-			for (int i = endExclusive - 1; i >= startInclusive; --i) {
-				if (i < 0 || i >= total) {
-					continue;
-				}
-				ImGuiMCP::PushID(std::to_string(i).c_str());
-				const bool selected = (g_selected == i);
-				if (ImGuiMCP::Selectable(entries[static_cast<std::size_t>(i)].entry.c_str(), selected)) {
-					g_selected = selected ? -1 : i;
-				}
-				ImGuiMCP::PopID();
-			}
+			// 左右两栏：左侧条目列表，右侧详情
+			const auto avail = ImGuiMCP::GetContentRegionAvail();
+			const float listWidth = std::max(200.0f, avail.x * 0.45f);
+			const float childHeight = std::max(120.0f, avail.y - 6.0f);
 
-			if (g_selected >= 0 && g_selected < total) {
-				ImGuiMCP::Separator();
-				const auto details = manager.DetailsForDisplay(entries[static_cast<std::size_t>(g_selected)]);
-				ImGuiMCP::TextUnformatted(details.c_str());
+			ImGuiMCP::PushID("log-list");
+			if (ImGuiMCP::BeginChild("entries", ImGuiMCP::ImVec2{ listWidth, childHeight }, 0, 0)) {
+				const int endExclusive = total - g_logPage * perPage;
+				const int startInclusive = std::max(0, endExclusive - perPage);
+				for (int i = endExclusive - 1; i >= startInclusive; --i) {
+					if (i < 0 || i >= total) {
+						continue;
+					}
+					ImGuiMCP::PushID(std::to_string(i).c_str());
+					const bool selected = (g_selected == i);
+					if (ImGuiMCP::Selectable(entries[static_cast<std::size_t>(i)].entry.c_str(), selected)) {
+						g_selected = selected ? -1 : i;
+					}
+					ImGuiMCP::PopID();
+				}
 			}
+			ImGuiMCP::EndChild();
+			ImGuiMCP::PopID();
+
+			ImGuiMCP::SameLine();
+
+			ImGuiMCP::PushID("log-details");
+			if (ImGuiMCP::BeginChild("details", ImGuiMCP::ImVec2{ 0.0f, childHeight }, 0, 0)) {
+				if (g_selected >= 0 && g_selected < total) {
+					const auto details = manager.DetailsForDisplay(entries[static_cast<std::size_t>(g_selected)]);
+					ImGuiMCP::PushTextWrapPos(0.0f);
+					ImGuiMCP::TextUnformatted(details.c_str());
+					ImGuiMCP::PopTextWrapPos();
+				} else {
+					ImGuiMCP::TextUnformatted(T("menulogselect", "Select an entry on the left").c_str());
+				}
+			}
+			ImGuiMCP::EndChild();
+			ImGuiMCP::PopID();
 		}
-
 		void RenderBlacklist()
 		{
 			auto& manager = Manager::GetSingleton();
@@ -286,3 +317,15 @@ namespace obit::Menu
 			SKSEMenuFramework::GetMenuFrameworkAPIVersion());
 	}
 }
+
+#else
+
+namespace obit::Menu
+{
+	void Register()
+	{
+		SKSE::log::info("ObituarySKSE: built without SKSEMenuFramework.h - F1 menu disabled");
+	}
+}
+
+#endif

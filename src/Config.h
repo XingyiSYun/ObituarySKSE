@@ -40,6 +40,7 @@ namespace obit
 		// 黑名单：设置文件里的 [Blacklist] Entries，插件解析成 FormID 集合
 		std::string sBlacklist;  // "0001A67C,Nazeem"
 
+
 		// 非原版：控制台/日志噪音
 		bool bVerboseLog{ false };
 	};
